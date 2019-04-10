@@ -81,6 +81,9 @@ switcher.addEventListener ('change', () => {
     switchMode();
 });
 
+
+// Добавление карточек видео
+
 const data = [
     ['img/thumb_3.webp', 'img/thumb_4.webp', 'img/thumb_5.webp'],
     ['#3 Вёрстка на flexbox CSS | Блок преимущества и галерея | Марафон вёрстки | Артём Исламов',
@@ -111,5 +114,96 @@ more.addEventListener('click', () => {
         setTimeout( () => {
             card.classList.remove('videos__item-active');
         }, 10);
+
+        bindNewModal(card);
+    }
+
+    sliceTitle('.videos__item-descr', 100);
+});
+
+
+// Обрезание описания видео
+
+function sliceTitle(selector, count) {
+    document.querySelectorAll(selector).forEach(item => {
+        item.textContent.trim();
+
+        if (item.textContent.length < count) {
+            return;
+        } else {
+            const str = item.textContent.slice(0, count + 1) + "...";
+            item.textContent = str;
+        }
+    });
+}
+
+sliceTitle('.videos__item-descr', 100);
+
+
+// Модальное окно
+
+function openModal() {
+    modal.style.display = 'block';
+}
+
+function closeModal() {
+    modal.style.display = 'none';
+    player.stopVideo();
+}
+
+function bindModal(cards) {
+    cards.forEach(item => {
+        item.addEventListener('click', (e) => {
+            e.preventDefault();
+            const id = item.getAttribute('data-url');
+            loadVideo(id);
+            openModal();
+        });
+    });
+}
+
+bindModal(videos);
+
+function bindNewModal(cards) {
+    cards.addEventListener('click', (e) => {
+        e.preventDefault();
+        const id = cards.getAttribute('data-url');
+        loadVideo(id);
+        openModal();
+    });
+}
+
+modal.addEventListener('click', (e) => {
+    if (!e.target.classList.contains('modal__body')) {
+        closeModal();
     }
 });
+
+
+// Подключаем YouTube API
+
+function createVideo() {
+    var tag = document.createElement('script');
+
+      tag.src = "https://www.youtube.com/iframe_api";
+      var firstScriptTag = document.getElementsByTagName('script')[0];
+      firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+      setTimeout( () => {
+        player = new YT.Player('frame', {
+            height: '100%',
+            width: '100%',
+            videoId: 'M7lc1UVf-VE'
+          });
+      }, 300);
+
+}
+
+createVideo();
+
+
+// Подгружаем своё видео
+
+function loadVideo(id) {
+    player.loadVideoById({'videoId': `${id}`});
+}
